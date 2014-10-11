@@ -1,0 +1,9 @@
+This project is a sample of an LCD controller for the Spartan-3E board. lcd.v is generic enough to be used for many other applications. I wrote it after spending several hours searching for a controller on Google. All the controllers I saw were extremely (hunderds of lines of code) long and complicated, or hardwired what they displayed and could not be easily adapted to what I wanted to do.
+
+When the .bit file is first loaded into the FPGA, the init flag in lcd.v is high. The controller feeds the startup sequence to the lcd (function set, display on, clear, entry mode) and then enters character display mode. In this mode, lcd interfaces with some other module by outputting the address of the character it is attempting to write, and writing the ascii character it finds on the 8 bit input bus. The address space of the screen is 00000 (upper left) -> 01111 (upper right) -> 10000 (bottom left) -> 11111 (bottom right). Characters are written at a rate of about 3KHz, which is fast enough to be responsive.
+
+This controller does have some limitations. The startup sequence is not repeatable: if the screen is already initalized, initializing it again (by writing another bit file to the FPGA, which forces init flag high again) will cause the screen to do weird things, and will certainly not do what you want it to. Unfortunately, you have to turn the board off and back on again before you write another program to it.
+
+One more note, the character 0 is not a blank space. That maps to the programmable GC memory of the screen, and can be any character. Instead, use 8'h02.
+
+William Gwozdz
