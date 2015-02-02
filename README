@@ -4,6 +4,6 @@ When the .bit file is first loaded into the FPGA, the init flag in lcd.v is high
 
 This controller does have some limitations. The startup sequence is not repeatable: if the screen is already initalized, initializing it again (by writing another bit file to the FPGA, which forces init flag high again) will cause the screen to do weird things, and will certainly not do what you want it to. Unfortunately, you have to turn the board off and back on again before you write another program to it.
 
-One more note, the character 0 is not a blank space. That maps to the programmable GC memory of the screen, and can be any character. Instead, use 8'h02.
+One more note, the character 0 is not a blank space. That maps to the programmable GC memory of the screen, and can be any character. Instead, use 8'h20.
 
 William Gwozdz
