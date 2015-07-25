@@ -20,26 +20,22 @@ module lcd (
 	
 	assign mem_addr = {row, count[k+6:k+3]};
 	
-	// To ensure that bus does not change while writing.
-	reg [7:0] stable_mem_bus;
-	always @ (mem_addr) begin
-		stable_mem_bus <= mem_bus;
-	end
+	initial count[j+7:j+2] = 11;
 
 	always @ (posedge clk) begin
 		count <= count + 1;
 		if (init) begin                    // initalization
 			case (count[j+7:j+2])
-				0: lcd_state <= 6'b000010;    // function set
-				1: lcd_state <= 6'b000010;
-				2: lcd_state <= 6'b001000;
-				3: lcd_state <= 6'b000000;    // display on/off control
-				4: lcd_state <= 6'b001100;
-				5: lcd_state <= 6'b000000;    // display clear
-				6: lcd_state <= 6'b000001;
-				7: lcd_state <= 6'b000000;    // entry mode set
-				8: lcd_state <= 6'b000110;
-				9: begin init <= ~init; count <= 0; end
+				1: lcd_state <= 6'b000010;    // function set
+				2: lcd_state <= 6'b000010;
+				3: lcd_state <= 6'b001000;
+				4: lcd_state <= 6'b000000;    // display on/off control
+				5: lcd_state <= 6'b001100;
+				6: lcd_state <= 6'b000000;    // display clear
+				7: lcd_state <= 6'b000001;
+				8: lcd_state <= 6'b000000;    // entry mode set
+				9: lcd_state <= 6'b000110;
+				10: begin init <= ~init; count <= 0; end
 			endcase
 			// Write lcd_state to the LCD and turn lcd_e high for the middle half of each lcd_state
 			{lcd_e,lcd_rs,lcd_rw,lcd_d[7:4]} <= {^count[j+1:j+0] & ~lcd_rw,lcd_state}; 
@@ -48,7 +44,7 @@ module lcd (
 				32: lcd_state <= {3'b001,~row,2'b00};                                 // Move cursor to begining of next line
 				33: lcd_state <= 6'b000000;
 				34: begin count <= 0; row <= ~row; end                                // Restart and switch which row is being written
-				default: lcd_state <= {2'b10, ~count[k+2] ? stable_mem_bus[7:4] : stable_mem_bus[3:0]}; // Pull characters from bus
+				default: lcd_state <= {2'b10, ~count[k+2] ? mem_bus[7:4] : mem_bus[3:0]}; // Pull characters from bus
 			endcase
 			// Write lcd_state to the LCD and turn lcd_e high for the middle half of each lcd_state
 			{lcd_e,lcd_rs,lcd_rw,lcd_d[7:4]} <= {^count[k+1:k+0] & ~lcd_rw,lcd_state};
